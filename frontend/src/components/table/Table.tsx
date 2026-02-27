@@ -188,6 +188,39 @@ const TableContent = memo(() => {
             </tr>
           ))}
         </tbody>
+        {table
+          .getFooterGroups()
+          .some((g) =>
+            g.headers.some(
+              (h) =>
+                !h.isPlaceholder &&
+                h.column.columnDef.footer !== undefined &&
+                h.column.columnDef.footer !== null,
+            ),
+          ) && (
+          <tfoot>
+            {table.getFooterGroups().map((footerGroup) => (
+              <tr
+                className="bg-gray-900/40 hover:bg-gray-900/70 transition-colors"
+                key={footerGroup.id}
+              >
+                {footerGroup.headers.map((header) => (
+                  <th
+                    className="px-4 py-3 text-left text-sm font-semibold text-gray-200"
+                    key={header.id}
+                  >
+                    {header.isPlaceholder
+                      ? null
+                      : flexRender(
+                          header.column.columnDef.footer,
+                          header.getContext(),
+                        )}
+                  </th>
+                ))}
+              </tr>
+            ))}
+          </tfoot>
+        )}
       </table>
     </div>
   );
