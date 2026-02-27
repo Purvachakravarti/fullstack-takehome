@@ -55,7 +55,7 @@ const TableContent = memo(() => {
     fetchPolicy: "cache-first",
   });
 
-  const posts = postsData?.posts ?? [];
+  const posts = useMemo<Post[]>(() => postsData?.posts ?? [], [postsData]);
 
   // 3) Group posts by userId (for count + hover list)
   const postsByUserId = useMemo(() => {
