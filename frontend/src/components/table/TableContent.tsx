@@ -13,6 +13,7 @@ import { GET_POSTS } from "../../gql/getPosts";
 import { PostsCell } from "./cells/PostsCell";
 import { GenericCell } from "./cells/GenericCell";
 import type { Post, GetPostsData, GetPostsVars, UserRow } from "@/types";
+import { LoadingSpinner } from "../LoadingSpinner";
 
 const columnHelper = createColumnHelper<UserRow>();
 
@@ -26,8 +27,10 @@ export const TableContent = memo(({ searchValue }: TableContentProps) => {
     data: usersData,
     loading: usersLoading,
     error: usersError,
+    networkStatus: usersNetworkStatus,
   } = useQuery(GetUsersDocument, {
     variables: { filters: {} },
+    notifyOnNetworkStatusChange: true,
   });
 
   const users = useMemo(() => {
@@ -49,9 +52,11 @@ export const TableContent = memo(({ searchValue }: TableContentProps) => {
     data: postsData,
     loading: postsLoading,
     error: postsError,
+    networkStatus: postsNetworkStatus,
   } = useQuery<GetPostsData, GetPostsVars>(GET_POSTS, {
     variables: { filters: {} },
-    fetchPolicy: "cache-first",
+    fetchPolicy: "cache-and-network",
+    notifyOnNetworkStatusChange: true,
   });
 
   const posts = useMemo<Post[]>(() => postsData?.posts ?? [], [postsData]);
@@ -132,7 +137,15 @@ export const TableContent = memo(({ searchValue }: TableContentProps) => {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  if (usersLoading) return <div className="p-4">Loading users...</div>;
+  const usersIsBusy = usersLoading || usersNetworkStatus === 4; // 4 = refetch
+
+  if (usersIsBusy)
+    return (
+      <div className="p-8 flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+
   if (usersError)
     return <div className="p-4 text-red-500">Error: {usersError.message}</div>;
 
@@ -142,9 +155,19 @@ export const TableContent = memo(({ searchValue }: TableContentProps) => {
     </div>
   ) : null;
 
+  const postsIsBusy = postsLoading || postsNetworkStatus === 4;
+
+  const postsLoadingBanner = postsIsBusy ? (
+    <div className="px-4 py-2 text-xs text-gray-300 flex items-center gap-2">
+      <LoadingSpinner size="sm" />
+      Loading posts…
+    </div>
+  ) : null;
+
   return (
     <div className="w-full overflow-x-auto">
       {postsWarning}
+      {postsLoadingBanner}
       <table className="min-w-full table-fixed border-separate border-spacing-y-2">
         <thead>
           {table.getHeaderGroups().map((headerGroup) => (
