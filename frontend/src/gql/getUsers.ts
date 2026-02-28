@@ -10,4 +10,4 @@ export const GET_USERS = gql`
       phone
     }
   }
-`
+`;

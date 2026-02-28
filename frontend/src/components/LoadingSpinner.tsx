@@ -1,5 +1,3 @@
-import React from "react";
-
 type LoadingSpinnerProps = {
   size?: "sm" | "md" | "lg";
   className?: string;

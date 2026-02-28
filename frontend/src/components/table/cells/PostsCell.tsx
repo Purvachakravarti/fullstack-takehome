@@ -1,20 +1,6 @@
 import { useState } from "react";
 import { LoadingSpinner } from "../../../components/LoadingSpinner";
-
-type Post = {
-  id: number;
-  userId: number | null;
-  title: string | null;
-  content: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-};
-
-type PostsCellProps = {
-  count: number | null; // null while loading
-  posts: Post[];
-  isLoading: boolean;
-};
+import type { PostsCellProps } from "@/types";
 
 export function PostsCell({ count, posts, isLoading }: PostsCellProps) {
   const [open, setOpen] = useState(false);

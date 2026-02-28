@@ -11,25 +11,12 @@ import {
   GetUsersDocument,
   type GetUsersQuery,
 } from "../../__generated__/graphql";
-import { GET_POSTS } from "../../gql/queries";
+import { GET_POSTS } from "../../gql/getPosts";
 
 import { TableFilters } from "./TableFilters";
 import { PostsCell } from "./cells/PostsCell";
 import { GenericCell } from "./cells/GenericCell";
-
-type UserRow = GetUsersQuery["users"][0];
-
-type Post = {
-  id: number;
-  userId: number | null;
-  title: string | null;
-  content: string;
-  createdAt: string | null;
-  updatedAt: string | null;
-};
-
-type GetPostsData = { posts: Post[] };
-type GetPostsVars = { filters: Record<string, unknown> };
+import type { Post, GetPostsData, GetPostsVars, UserRow } from "@/types";
 
 const columnHelper = createColumnHelper<UserRow>();
 
