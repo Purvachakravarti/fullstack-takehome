@@ -1,4 +1,6 @@
 export type TableFiltersProps = {
-  searchValue: string;
-  setSearchValue: (value: string) => void;
+  draftSearchValue: string;
+  setDraftSearchValue: (v: string) => void;
+  onSearch: () => void;
+  onClear: () => void;
 };

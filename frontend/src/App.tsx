@@ -1,11 +1,11 @@
-import { Table } from './components/table/Table'
+import { Table } from "./components/table/Table";
 
 function App() {
   return (
     <>
       <Table />
     </>
-  )
+  );
 }
 
-export default App
+export default App;
