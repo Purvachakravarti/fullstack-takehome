@@ -14,9 +14,11 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n  query GetPosts($filters: PostFilters!) {\n    posts(filters: $filters) {\n      id\n      userId\n      title\n      content\n      createdAt\n      updatedAt\n    }\n  }\n": typeof types.GetPostsDocument,
     "\n  query GetUsers($filters: UserFilters!) {\n    users(filters: $filters) {\n      id\n      name\n      age\n      email\n      phone\n    }\n  }\n": typeof types.GetUsersDocument,
 };
 const documents: Documents = {
+    "\n  query GetPosts($filters: PostFilters!) {\n    posts(filters: $filters) {\n      id\n      userId\n      title\n      content\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetPostsDocument,
     "\n  query GetUsers($filters: UserFilters!) {\n    users(filters: $filters) {\n      id\n      name\n      age\n      email\n      phone\n    }\n  }\n": types.GetUsersDocument,
 };
 
@@ -34,6 +36,10 @@ const documents: Documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  query GetPosts($filters: PostFilters!) {\n    posts(filters: $filters) {\n      id\n      userId\n      title\n      content\n      createdAt\n      updatedAt\n    }\n  }\n"): (typeof documents)["\n  query GetPosts($filters: PostFilters!) {\n    posts(filters: $filters) {\n      id\n      userId\n      title\n      content\n      createdAt\n      updatedAt\n    }\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

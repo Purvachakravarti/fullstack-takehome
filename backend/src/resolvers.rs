@@ -8,9 +8,9 @@ use sqlx::{
 #[derive(FromRow)]
 struct User {
     id: i32,
-    name: Option<String>,
-    age: Option<i32>,
-    email: Option<String>,
+    name: Option<String>, // this need to allign with the DB - not changing it at this time
+    age: Option<i32>,// this need to allign with the DB - not changing it at this time
+    email: Option<String>,// this need to allign with the DB - not changing it at this time
     phone: Option<String>,
     created_at: Option<DateTime<Utc>>,
     updated_at: Option<DateTime<Utc>>,
@@ -53,8 +53,8 @@ struct PostFilters {
 #[derive(FromRow)]
 struct Post {
     id: i32,
-    user_id: Option<i32>,
-    title: Option<String>,
+    user_id: i32,
+    title: String,
     content: String,
     created_at: Option<DateTime<Utc>>,
     updated_at: Option<DateTime<Utc>>,
@@ -107,16 +107,16 @@ impl Post {
         self.id
     }
 
-    async fn user_id(&self) -> &Option<i32> {
-        &self.user_id
+    async fn user_id(&self) -> i32 {
+        self.user_id
     }
 
-    async fn title(&self) -> &Option<String> {
+    async fn title(&self) -> &str {
         &self.title
     }
     
    async fn content(&self) -> &str {
-    &self.content
+        &self.content
     }
 
     async fn created_at(&self) -> &Option<DateTime<Utc>> {
@@ -127,17 +127,13 @@ impl Post {
         &self.updated_at
     }
 
-    async fn user(&self, ctx: &Context<'_>) -> Result<Option<User>> {
-        if let Some(user_id) = self.user_id {
-            let pool = ctx.data::<PgPool>()?;
-            let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE id = $1")
-                .bind(user_id)
-                .fetch_optional(pool)
-                .await?;
-            Ok(user)
-        } else {
-            Ok(None)
-        }
+   async fn user(&self, ctx: &Context<'_>) -> Result<User> {
+    let pool = ctx.data::<PgPool>()?;
+    let user = sqlx::query_as::<_, User>("SELECT * FROM users WHERE id = $1")
+        .bind(self.user_id)
+        .fetch_one(pool)
+        .await?;
+    Ok(user)
     }
 }
 
