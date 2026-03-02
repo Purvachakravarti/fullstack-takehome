@@ -66,9 +66,9 @@ export const TableContent = memo(({ searchValue }: TableContentProps) => {
     const map = new Map<number, Post[]>();
     for (const p of posts) {
       if (p.userId == null) continue;
-      const list = map.get(p.userId) ?? [];
-      list.push(p);
-      map.set(p.userId, list);
+      const list = map.get(p.userId);
+      if (list) list.push(p);
+      else map.set(p.userId, [p]);
     }
     return map;
   }, [posts]);
@@ -137,7 +137,7 @@ export const TableContent = memo(({ searchValue }: TableContentProps) => {
     getCoreRowModel: getCoreRowModel(),
   });
 
-  const usersIsBusy = usersLoading || usersNetworkStatus === 4; // 4 = refetch
+  const usersIsBusy = usersLoading || usersNetworkStatus === 4; // 4 = refetch - Apollo's networkStatus enum
 
   if (usersIsBusy)
     return (
