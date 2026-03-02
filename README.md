@@ -29,7 +29,6 @@ Welcome to our fullstack take-home assignment! This project consists of a React 
    ```
 
    This will:
-
    - Start a PostgreSQL database on port 5432
    - Automatically run the `init.sql` script to set up the database schema and seed data
    - Start the GraphQL API server on port 8000
@@ -68,12 +67,10 @@ Welcome to our fullstack take-home assignment! This project consists of a React 
 #### Required Tasks
 
 1. **Complete the GenericCell component** (`src/components/table/cells/GenericCell.tsx`)
-
    - This component should handle rendering different data types appropriately
    - Consider how to display strings, numbers, dates, and other data types
 
 2. **Implement Posts Column with Hover Details**
-
    - Add a "Posts" column to the table that displays the number of posts each user has
    - Create a hover component that shows post titles and content when hovering over the posts count
    - You'll need to query posts data using the available GraphQL endpoints
@@ -95,13 +92,11 @@ Welcome to our fullstack take-home assignment! This project consists of a React 
 #### Required Tasks
 
 1. **Extend the Posts Data Model**
-
    - The `Post` struct in `src/resolvers.rs` currently has basic fields
    - You need to add a new field to store post content/body text
    - Consider what data type is most appropriate for storing longer text content
 
 2. **Update Database Schema**
-
    - Ensure your database schema supports the new field you're adding
    - The `init.sql` file contains the initial database setup
    - Consider how existing posts should handle the new field
@@ -121,7 +116,6 @@ Welcome to our fullstack take-home assignment! This project consists of a React 
 ### Integration Tasks
 
 1. **Frontend-Backend Integration**
-
    - Update frontend GraphQL queries to fetch the new post content field
    - Ensure the Posts column hover details display the new content
    - Test the end-to-end functionality
@@ -233,3 +227,85 @@ query GetPosts($filters: PostFilters) {
   - Ensure these ports are available or modify docker-compose.yml accordingly
 
 Good luck! Feel free to make improvements beyond the required tasks if you see opportunities to enhance the application.
+
+Thank you.
+
+## Design Decisions & Intentional Tradeoffs
+
+This implementation focuses on correctness, clarity, and fulfilling the stated requirements while keeping the scope appropriate for a take-home assignment. Below are areas intentionally simplified and the reasoning behind those decisions.
+
+1. Search Input Without Debouncing
+
+The user search filter is implemented client-side without debouncing.
+
+Reasoning:
+The dataset size is small and filtering is performed in-memory. Adding debouncing would introduce additional state management and complexity without measurable benefit in this context.
+
+Production Consideration:
+If filtering triggered network requests or operated on large datasets, I would introduce a small debounce (150–300ms) or use useDeferredValue to optimize responsiveness.
+
+2. No Pagination or Virtualization
+
+Pagination was not implemented for users or posts.
+
+Reasoning:
+The current dataset is small and fits comfortably in memory. Pagination introduces additional GraphQL API surface area (cursor/offset management), UI controls, and additional edge cases that were not required by the specification.
+
+Production Consideration:
+For larger datasets, I would implement cursor-based pagination at the GraphQL layer and consider row virtualization on the frontend.
+
+3. Nullable User Fields in Rust
+
+Some User fields are defined as Option<T> in Rust, even though the database schema enforces NOT NULL for certain columns.
+
+Reasoning:
+The focus was on correctly implementing and aligning the new Post.content field across the database, resolver, and GraphQL schema. The nullable user fields do not impact correctness in this scope.
+
+Production Consideration:
+In a production system, I would fully align Rust types with database constraints to eliminate unnecessary Option usage and ensure strict type consistency.
+
+4. No DataLoader / N+1 Optimization
+
+The Post.user resolver executes a direct query without batching.
+
+Reasoning:
+The expected query volume in this demo environment is minimal. Introducing batching (e.g., DataLoader) would add complexity beyond the assignment requirements.
+
+Production Consideration:
+For higher traffic scenarios, I would implement batching to prevent N+1 query patterns.
+
+5. Client-Side Filtering
+
+Filtering of users is handled on the frontend.
+
+Reasoning:
+Given the small dataset and simplicity of the filtering logic, client-side filtering provides immediate responsiveness without additional network calls.
+
+Production Consideration:
+For larger datasets, filtering would be moved server-side with proper indexing and pagination support.
+
+6. Database Initialization vs. Migration Framework
+
+Schema updates are handled in init.sql rather than through a versioned migration framework.
+
+Reasoning:
+The project uses Docker-based initialization for simplicity and reproducibility in a local development environment.
+
+Production Consideration:
+In a real-world system, I would use a migration tool (e.g., sqlx migrations) to version and safely evolve the schema.
+
+7. Manual Data Validation Instead of Mutation-Based Testing
+
+Although a mutation can be implemented to create posts, schema validation and testing of the new content field were performed using manual SQL inserts and GraphQL queries.
+
+Reasoning:
+The assignment focused on extending the data model and exposing the new field through the GraphQL API. Manual SQL validation ensured that:
+
+The database schema correctly enforced TEXT NOT NULL
+
+The default value behaved as expected
+
+The GraphQL query layer exposed the field properly
+
+Production Consideration:
+In a full application, I would expose and test mutations for create/update operations and include automated integration tests to validate end-to-end behavior.
